@@ -67,14 +67,15 @@ def extract_links_from_html(html_text: str, target_keyword) -> list:
                 
     return results
 
-def query_search_engines(search_query: str, target_keyword: str) -> list:
+def query_search_engines(search_query: str, target_keyword, page: int = 1) -> list:
     """
     Performs search query on Yahoo and DuckDuckGo to extract specific matching URLs.
     """
     encoded = urllib.parse.quote_plus(search_query)
+    offset = (page - 1) * 10 + 1
     
     # Method 1: Yahoo Search (Very high reliability, no aggressive bot block)
-    yahoo_url = f"https://search.yahoo.com/search?q={encoded}"
+    yahoo_url = f"https://search.yahoo.com/search?q={encoded}&b={offset}"
     try:
         response = requests.get(yahoo_url, headers=HEADERS, timeout=10)
         if response.status_code == 200:
@@ -350,11 +351,16 @@ def find_hiring_companies(job_title: str, location: str, limit: int = 5) -> list
     companies = []
     seen_companies = set()
     
+    # Pick a random page to vary results each scan (1 to 4)
+    import random
+    page = random.randint(1, 4)
+    
     # Scan Greenhouse and Lever results in a single search engine query to avoid rate limits
-    links = query_search_engines(query, ["greenhouse.io", "lever.co"])
+    links = query_search_engines(query, ["greenhouse.io", "lever.co"], page=page)
     
     for url, title_text in links:
-        if len(companies) >= limit:
+        # Collect up to 20 potential companies to shuffle
+        if len(companies) >= 20:
             break
             
         # Check if the URL is a specific job listing page, not a general job board directory
@@ -379,6 +385,11 @@ def find_hiring_companies(job_title: str, location: str, limit: int = 5) -> list
                     "url": url
                 })
                 
+    # Shuffle results to return a randomized set on subsequent clicks
+    if companies:
+        random.shuffle(companies)
+        companies = companies[:limit]
+        
     # Fallback to high-quality main careers pages if no results returned (to avoid generic 404s)
     if not companies:
         fallback_list = [
