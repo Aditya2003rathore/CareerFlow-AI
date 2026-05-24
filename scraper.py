@@ -12,12 +12,13 @@ HEADERS = {
     "Referer": "https://search.yahoo.com/"
 }
 
-def extract_links_from_html(html_text: str, target_keyword: str) -> list:
+def extract_links_from_html(html_text: str, target_keyword) -> list:
     """
-    Scans HTML content and extracts links containing the target keyword.
+    Scans HTML content and extracts links containing the target keyword(s).
     Decodes redirects from Yahoo or DuckDuckGo if present.
     Returns a list of tuples: (clean_url, title_text)
     """
+    keywords = [target_keyword] if isinstance(target_keyword, str) else target_keyword
     soup = BeautifulSoup(html_text, 'html.parser')
     results = []
     seen = set()
@@ -54,7 +55,7 @@ def extract_links_from_html(html_text: str, target_keyword: str) -> list:
                 pass
                 
         # Filter and capture target URLs
-        if target_keyword in real_url:
+        if any(kw in real_url for kw in keywords):
             clean_url = real_url.split('?')[0]
             if clean_url.startswith("http") and clean_url not in seen:
                 parsed_real = urllib.parse.urlparse(clean_url)
@@ -315,6 +316,26 @@ def clean_role_title(title: str, job_title: str, company: str) -> str:
         
     return t
 
+def is_specific_job_url(url: str) -> bool:
+    """
+    Checks if a Lever or Greenhouse URL points to a specific job listing (contains a job ID or UUID)
+    rather than a general company-wide careers landing page/job board list.
+    """
+    parsed = urllib.parse.urlparse(url)
+    domain = parsed.netloc.lower()
+    path_parts = [p for p in parsed.path.split('/') if p]
+    
+    if "greenhouse.io" in domain:
+        if "jobs" in path_parts:
+            jobs_idx = path_parts.index("jobs")
+            if len(path_parts) > jobs_idx + 1:
+                return path_parts[jobs_idx + 1].isdigit()
+    elif "lever.co" in domain:
+        if len(path_parts) >= 2:
+            if path_parts[1] not in ["jobs", "careers", "about", "press"]:
+                return True
+    return False
+
 def find_hiring_companies(job_title: str, location: str, limit: int = 5) -> list:
     """
     Finds real active jobs by scanning Lever & Greenhouse postings via search engines.
@@ -329,15 +350,16 @@ def find_hiring_companies(job_title: str, location: str, limit: int = 5) -> list
     companies = []
     seen_companies = set()
     
-    # Scan Greenhouse and Lever results
-    links = []
-    for platform in ["greenhouse.io", "lever.co"]:
-        platform_links = query_search_engines(query, platform)
-        links.extend(platform_links)
-        
+    # Scan Greenhouse and Lever results in a single search engine query to avoid rate limits
+    links = query_search_engines(query, ["greenhouse.io", "lever.co"])
+    
     for url, title_text in links:
         if len(companies) >= limit:
             break
+            
+        # Check if the URL is a specific job listing page, not a general job board directory
+        if not is_specific_job_url(url):
+            continue
             
         raw_company = extract_company_from_url(url)
         if not raw_company:
