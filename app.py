@@ -136,6 +136,23 @@ def save_user_resume(username: str, pdf_bytes: bytes, filename: str) -> bool:
     except Exception:
         return False
 
+def delete_user_resume(username: str) -> bool:
+    """
+    Deletes the user's resume PDF from disk and updates their config.
+    """
+    path = get_user_resume_path(username)
+    try:
+        if os.path.exists(path):
+            os.remove(path)
+        configs = load_user_configs()
+        if username in configs and "resume_filename" in configs[username]:
+            del configs[username]["resume_filename"]
+            with open(USER_CONFIG_FILE, "w") as f:
+                json.dump(configs, f, indent=4)
+        return True
+    except Exception:
+        return False
+
 # Session State initialization
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
@@ -466,12 +483,41 @@ with st.sidebar:
         else:
             st.error("Failed to save credentials.")
 
+    if st.button("Clear Saved Credentials", use_container_width=True):
+        configs = load_user_configs()
+        if st.session_state.current_user in configs:
+            for k in ["gemini_api_key", "hunter_api_key", "sender_email", "sender_app_password"]:
+                if k in configs[st.session_state.current_user]:
+                    del configs[st.session_state.current_user][k]
+            try:
+                with open(USER_CONFIG_FILE, "w") as f:
+                    json.dump(configs, f, indent=4)
+                st.session_state.user_gemini_key = ""
+                st.session_state.user_hunter_key = ""
+                st.session_state.user_sender_email = ""
+                st.session_state.user_app_password = ""
+                st.success("Credentials cleared from profile.")
+                st.rerun()
+            except Exception:
+                st.error("Failed to clear credentials.")
+
     st.markdown("---")
     st.markdown("### Upload Resume")
     label_text = "Upload PDF Resume"
     if st.session_state.resume_filename:
         label_text += f" (Current: {st.session_state.resume_filename})"
     uploaded_file = st.file_uploader(label_text, type=["pdf"])
+    
+    if st.session_state.resume_filename:
+        if st.button("Delete Saved Resume", type="secondary", use_container_width=True):
+            if delete_user_resume(st.session_state.current_user):
+                st.session_state.resume_text = ""
+                st.session_state.resume_bytes = None
+                st.session_state.resume_filename = ""
+                st.success("Saved resume deleted.")
+                st.rerun()
+            else:
+                st.error("Failed to delete resume.")
     
     if uploaded_file is not None:
         if (st.session_state.resume_filename != uploaded_file.name or 
