@@ -1,0 +1,18 @@
+# Local config and databases containing user credentials
+config_users.json
+audit_log.json
+
+# Uploaded Resumes
+resumes/
+
+# Python caching
+__pycache__/
+*.pyc
+
+# System / IDE files
+.DS_Store
+.vscode/
+
+# Temp / Scratch files
+.tempmediaStorage/
+scratch/
