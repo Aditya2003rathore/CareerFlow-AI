@@ -344,9 +344,10 @@ def find_hiring_companies(job_title: str, location: str, limit: int = 5) -> list
     if not job_title:
         return []
         
-    query = f'(site:greenhouse.io OR site:lever.co) "{job_title}"'
+    # Construct broad query (no strict quotes) to allow fuzzy matching (e.g. Software Engineer in New Delhi/NCR)
+    query = f'(site:greenhouse.io OR site:lever.co) {job_title}'
     if location:
-        query += f' "{location}"'
+        query += f' {location}'
         
     companies = []
     seen_companies = set()
