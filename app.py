@@ -187,6 +187,24 @@ if 'user_app_password' not in st.session_state:
 if 'config_loaded' not in st.session_state:
     st.session_state.config_loaded = False
 
+def reset_user_session():
+    """
+    Resets all user-specific data from the Streamlit session state.
+    """
+    st.session_state.resume_text = ""
+    st.session_state.resume_bytes = None
+    st.session_state.resume_filename = ""
+    st.session_state.ats_results = None
+    st.session_state.leads = []
+    st.session_state.drafts = {}
+    st.session_state.discovered_jobs = []
+    st.session_state.pipeline_logs = {}
+    st.session_state.user_gemini_key = ""
+    st.session_state.user_hunter_key = ""
+    st.session_state.user_sender_email = ""
+    st.session_state.user_app_password = ""
+
+
 # Inject Global Premium Dark-Mode CSS (No emojis)
 st.markdown("""
 <style>
@@ -439,6 +457,7 @@ if not st.session_state.authenticated:
 
 # Load persisted keys for current user on first login run
 if not st.session_state.config_loaded:
+    reset_user_session()
     user_configs = load_user_configs()
     current_config = user_configs.get(st.session_state.current_user, {})
     st.session_state.user_gemini_key = current_config.get("gemini_api_key", "")
@@ -469,6 +488,7 @@ with col_head1:
 with col_head2:
     st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
     if st.button("Terminate Session", use_container_width=True):
+        reset_user_session()
         st.session_state.authenticated = False
         st.session_state.current_user = ""
         st.session_state.config_loaded = False
