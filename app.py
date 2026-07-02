@@ -213,16 +213,17 @@ st.markdown("""
     /* Set global font and dark mode canvas */
     html, body, [class*="css"], .stMarkdown {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        color: #F1F5F9;
+        color: #E2E8F0;
     }
     
     /* Root main container background */
     .stApp {
-        background-color: #0B0F19;
+        background-color: #030712;
         background-image: 
-            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
-            radial-gradient(at 50% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.07) 0px, transparent 50%);
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            radial-gradient(at 50% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.08) 0px, transparent 50%),
+            radial-gradient(at 10% 80%, rgba(244, 63, 94, 0.05) 0px, transparent 40%);
         background-attachment: fixed;
     }
     
@@ -236,22 +237,23 @@ st.markdown("""
         max-width: 450px;
         margin: 5% auto;
         padding: 3rem 2.5rem;
-        background: rgba(17, 24, 39, 0.7);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(7, 10, 19, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(99, 102, 241, 0.2);
         border-radius: 24px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.1);
         text-align: center;
     }
     
     .login-logo {
-        font-size: 2.2rem;
+        font-size: 2.5rem;
         font-weight: 800;
         letter-spacing: -0.05em;
-        background: linear-gradient(135deg, #818CF8 0%, #3B82F6 100%);
+        background: linear-gradient(135deg, #A5B4FC 0%, #6366F1 50%, #3B82F6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
+        filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.2));
     }
     
     .login-subtitle {
@@ -262,13 +264,13 @@ st.markdown("""
     
     /* Sleek Dashboard Header */
     .dash-header {
-        background: rgba(17, 24, 39, 0.65);
-        backdrop-filter: blur(12px);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.45) 100%);
+        backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         padding: 2rem 2.5rem;
-        border-radius: 20px;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        border-radius: 24px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -277,29 +279,36 @@ st.markdown("""
     }
     
     .dash-logo-text {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: 800;
         letter-spacing: -0.04em;
-        background: linear-gradient(135deg, #818CF8 0%, #60A5FA 100%);
+        background: linear-gradient(135deg, #A5B4FC 0%, #818CF8 50%, #60A5FA 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 2px 8px rgba(129, 140, 248, 0.15));
     }
     
     .dash-sub-text {
         font-size: 0.9rem;
         color: #94A3B8;
-        margin-top: 0.2rem;
+        margin-top: 0.3rem;
     }
     
     /* Custom glassmorphic cards */
     .glass-card {
-        background: rgba(30, 41, 59, 0.4);
-        backdrop-filter: blur(8px);
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.45) 0%, rgba(15, 23, 42, 0.3) 100%);
+        backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1.2rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        border-radius: 20px;
+        padding: 1.8rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(99, 102, 241, 0.2);
+        box-shadow: 0 12px 40px rgba(99, 102, 241, 0.12), 0 4px 12px rgba(0, 0, 0, 0.3);
     }
     
     /* ATS Score Layout */
@@ -307,35 +316,36 @@ st.markdown("""
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin: 1rem 0;
+        margin: 1.5rem 0;
     }
     
     .radial-score {
-        width: 150px;
-        height: 150px;
+        width: 160px;
+        height: 160px;
         border-radius: 50%;
-        background: conic-gradient(#818CF8 var(--score-angle), #1E293B 0deg);
+        background: conic-gradient(#6366F1 var(--score-angle), #1E293B 0deg);
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
-        box-shadow: 0 4px 20px rgba(129, 140, 248, 0.15);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.05);
     }
     
     .radial-score::before {
         content: '';
         position: absolute;
-        width: 126px;
-        height: 126px;
+        width: 132px;
+        height: 132px;
         border-radius: 50%;
-        background: #0B0F19;
+        background: #030712;
+        box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.3);
     }
     
     .radial-score-value {
         position: absolute;
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%);
+        background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
@@ -343,33 +353,152 @@ st.markdown("""
     /* Badge styling */
     .badge {
         display: inline-block;
-        padding: 0.25rem 0.6rem;
+        padding: 0.3rem 0.75rem;
         border-radius: 9999px;
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
+        letter-spacing: 0.05em;
         margin-right: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
     
-    .badge-success { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.2); }
-    .badge-warning { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.2); }
-    .badge-error { background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.25); }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .badge-error { background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+    
+    /* Custom style for primary and secondary Streamlit buttons */
+    button[data-testid="stBaseButton-primary"] {
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    button[data-testid="stBaseButton-primary"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6) !important;
+        background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%) !important;
+    }
+    
+    button[data-testid="stBaseButton-primary"]:active {
+        transform: translateY(0px) !important;
+    }
+    
+    button[data-testid="stBaseButton-secondary"] {
+        background-color: rgba(30, 41, 59, 0.6) !important;
+        color: #E2E8F0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    button[data-testid="stBaseButton-secondary"]:hover {
+        transform: translateY(-2px) !important;
+        background-color: rgba(51, 65, 85, 0.8) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25) !important;
+    }
+    
+    button[data-testid="stBaseButton-secondary"]:active {
+        transform: translateY(0px) !important;
+    }
+    
+    /* Style the tabs widget for premium Segmented Controls look */
+    div[data-baseweb="tab-list"] {
+        gap: 0.5rem !important;
+        background-color: rgba(15, 23, 42, 0.5) !important;
+        padding: 6px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    button[data-baseweb="tab"] {
+        background-color: transparent !important;
+        color: #94A3B8 !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 10px 24px !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        transition: all 0.2s ease !important;
+        height: auto !important;
+    }
+    
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background-color: rgba(99, 102, 241, 0.15) !important;
+        color: #A5B4FC !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+        border-bottom: none !important;
+    }
+    
+    button[data-baseweb="tab"]:hover {
+        color: #E2E8F0 !important;
+        background-color: rgba(255, 255, 255, 0.03) !important;
+    }
     
     /* Input adjustments for Streamlit components to match dark mode */
-    div[data-baseweb="input"], div[data-baseweb="textarea"] {
-        background-color: #1E293B !important;
-        border: 1px solid #334155 !important;
-        border-radius: 10px !important;
+    div[data-baseweb="input"], div[data-baseweb="textarea"], div[data-baseweb="select"] {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    div[data-baseweb="input"]:focus-within, div[data-baseweb="textarea"]:focus-within, div[data-baseweb="select"]:focus-within {
+        border-color: #6366F1 !important;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
     }
     
     div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {
         color: #F8FAFC !important;
     }
     
+    /* File Uploader Box customization */
+    div[data-testid="stFileUploader"] section {
+        background-color: rgba(15, 23, 42, 0.5) !important;
+        border: 2px dashed rgba(99, 102, 241, 0.2) !important;
+        border-radius: 16px !important;
+        padding: 2rem !important;
+        transition: all 0.2s ease !important;
+        color: #94A3B8 !important;
+    }
+    
+    div[data-testid="stFileUploader"] section:hover {
+        border-color: #6366F1 !important;
+        background-color: rgba(99, 102, 241, 0.03) !important;
+    }
+    
     /* Sidebar adjustments */
     section[data-testid="stSidebar"] {
-        background-color: #070A13 !important;
-        border-right: 1px solid #1E293B !important;
+        background-color: #030712 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    section[data-testid="stSidebar"] div[class*="stVerticalBlock"] {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    /* Sleek Custom Alert styling */
+    div[data-testid="stAlert"] {
+        background-color: rgba(30, 41, 59, 0.4) !important;
+        backdrop-filter: blur(8px) !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        padding: 1rem 1.5rem !important;
+        color: #E2E8F0 !important;
+    }
+    
+    div[data-testid="stAlert"] div[role="alert"] {
+        color: #E2E8F0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
