@@ -367,22 +367,69 @@ if not st.session_state.authenticated:
     
     col_l1, col_l2, col_l3 = st.columns([1.2, 1.8, 1.2])
     with col_l2:
-        with st.form("login_form"):
-            username = st.text_input("Username", placeholder="Enter username")
-            password = st.text_input("Password", type="password", placeholder="Enter password")
-            login_btn = st.form_submit_button("Authenticate Access", use_container_width=True)
-            
-            if login_btn:
-                if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
-                    st.session_state.authenticated = True
-                    st.session_state.current_user = username
-                    st.session_state.config_loaded = False  # Trigger reload for this user
-                    st.success("Access Authorized. Initializing...")
-                    time.sleep(0.5)
-                    st.rerun()
-                else:
-                    st.error("Invalid username or credentials. Please check with your administrator.")
+        login_tab, register_tab = st.tabs(["Log In", "Create Account"])
         
+        with login_tab:
+            with st.form("login_form"):
+                username = st.text_input("Username", placeholder="Enter username", key="login_username")
+                password = st.text_input("Password", type="password", placeholder="Enter password", key="login_password")
+                login_btn = st.form_submit_button("Authenticate Access", use_container_width=True)
+                
+                if login_btn:
+                    username_clean = username.strip()
+                    configs = load_user_configs()
+                    
+                    is_valid = False
+                    if username_clean in USER_CREDENTIALS and USER_CREDENTIALS[username_clean] == password:
+                        is_valid = True
+                    elif username_clean in configs and configs[username_clean].get("password") == password:
+                        is_valid = True
+                        
+                    if is_valid:
+                        st.session_state.authenticated = True
+                        st.session_state.current_user = username_clean
+                        st.session_state.config_loaded = False  # Trigger reload for this user
+                        st.success("Access Authorized. Initializing...")
+                        time.sleep(0.5)
+                        st.rerun()
+                    else:
+                        st.error("Invalid username or credentials. Please try again or register.")
+                        
+        with register_tab:
+            with st.form("register_form"):
+                new_username = st.text_input("New Username", placeholder="Enter a new username", key="reg_username")
+                new_password = st.text_input("New Password", type="password", placeholder="Enter a password", key="reg_password")
+                confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password", key="reg_confirm_password")
+                register_btn = st.form_submit_button("Register Account", use_container_width=True)
+                
+                if register_btn:
+                    username_clean = new_username.strip()
+                    password_clean = new_password.strip()
+                    confirm_clean = confirm_password.strip()
+                    
+                    configs = load_user_configs()
+                    
+                    if not username_clean:
+                        st.error("Username cannot be empty.")
+                    elif not username_clean.isalnum():
+                        st.error("Username must contain only letters and numbers (alphanumeric).")
+                    elif len(username_clean) < 3:
+                        st.error("Username must be at least 3 characters long.")
+                    elif not password_clean:
+                        st.error("Password cannot be empty.")
+                    elif len(password_clean) < 6:
+                        st.error("Password must be at least 6 characters long.")
+                    elif password_clean != confirm_clean:
+                        st.error("Passwords do not match.")
+                    elif username_clean in USER_CREDENTIALS or username_clean in configs:
+                        st.error("Username is already taken. Please choose another name.")
+                    else:
+                        reg_data = {"password": password_clean}
+                        if save_user_config(username_clean, reg_data):
+                            st.success("Account successfully created! Please switch to the 'Log In' tab to access your workspace.")
+                        else:
+                            st.error("Failed to create account. Please contact your system administrator.")
+                            
         st.markdown("""
         <div style="text-align: center; color: #64748B; font-size: 0.8rem; margin-top: 2rem;">
             Authorized users only. Powered by Gemini 1.5 Flash.
