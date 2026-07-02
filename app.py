@@ -186,6 +186,8 @@ if 'user_app_password' not in st.session_state:
     st.session_state.user_app_password = ""
 if 'config_loaded' not in st.session_state:
     st.session_state.config_loaded = False
+if 'theme' not in st.session_state:
+    st.session_state.theme = "dark"
 
 def reset_user_session():
     """
@@ -204,9 +206,326 @@ def reset_user_session():
     st.session_state.user_sender_email = ""
     st.session_state.user_app_password = ""
 
+def render_theme_toggle(key_prefix: str = ""):
+    theme_emoji = "☀️" if st.session_state.theme == "dark" else "🌙"
+    theme_label = "Switch to Light Mode" if st.session_state.theme == "dark" else "Switch to Dark Mode"
+    if st.button(f"{theme_emoji} {theme_label}", key=f"{key_prefix}theme_toggle_btn", use_container_width=True):
+        st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+        st.rerun()
 
-# Inject Global Premium Dark-Mode CSS (No emojis)
-st.markdown("""
+# Inject Global Premium Theme CSS
+theme = st.session_state.theme
+if theme == "light":
+    st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    
+    /* Set global font and light mode canvas */
+    html, body, [class*="css"], .stMarkdown {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #334155;
+    }
+    
+    /* Root main container background */
+    .stApp {
+        background-color: #F8FAFC;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+            radial-gradient(at 50% 0%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.05) 0px, transparent 50%);
+        background-attachment: fixed;
+    }
+    
+    /* Hide default Streamlit decoration line */
+    header[data-testid="stHeader"] {
+        background: transparent;
+    }
+    
+    /* Premium Glassmorphic Login Container */
+    .login-container {
+        max-width: 450px;
+        margin: 5% auto;
+        padding: 3rem 2.5rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(241, 245, 249, 0.9) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.05), 0 0 30px rgba(99, 102, 241, 0.03);
+        text-align: center;
+    }
+    
+    .login-logo {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.1));
+    }
+    
+    .login-subtitle {
+        font-size: 0.95rem;
+        color: #64748B;
+        margin-bottom: 2rem;
+    }
+    
+    /* Sleek Dashboard Header */
+    .dash-header {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(241, 245, 249, 0.5) 100%);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        padding: 2rem 2.5rem;
+        border-radius: 24px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .dash-logo-text {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.1));
+    }
+    
+    .dash-sub-text {
+        font-size: 0.9rem;
+        color: #475569;
+        margin-top: 0.3rem;
+    }
+    
+    /* Custom glassmorphic cards */
+    .glass-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(241, 245, 249, 0.5) 100%);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        border-radius: 20px;
+        padding: 1.8rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: #334155;
+    }
+    .glass-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(99, 102, 241, 0.3);
+        box-shadow: 0 8px 30px rgba(99, 102, 241, 0.12);
+    }
+    
+    /* ATS Score Layout */
+    .score-circle-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 1.5rem 0;
+    }
+    
+    .radial-score {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: conic-gradient(#6366F1 var(--score-angle), #E2E8F0 0deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
+    }
+    
+    .radial-score::before {
+        content: '';
+        position: absolute;
+        width: 132px;
+        height: 132px;
+        border-radius: 50%;
+        background: #F8FAFC;
+    }
+    
+    .radial-score-value {
+        position: absolute;
+        font-size: 2.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    /* Badge styling */
+    .badge {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .badge-success { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .badge-warning { background: rgba(245, 158, 11, 0.1); color: #D97706; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .badge-error { background: rgba(239, 68, 68, 0.1); color: #DC2626; border: 1px solid rgba(239, 68, 68, 0.2); }
+    
+    /* Custom style for primary and secondary Streamlit buttons */
+    button[data-testid="stBaseButton-primary"] {
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    button[data-testid="stBaseButton-primary"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5) !important;
+        background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%) !important;
+    }
+    
+    button[data-testid="stBaseButton-primary"]:active {
+        transform: translateY(0px) !important;
+    }
+    
+    button[data-testid="stBaseButton-secondary"] {
+        background-color: #FFFFFF !important;
+        color: #334155 !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    button[data-testid="stBaseButton-secondary"]:hover {
+        transform: translateY(-2px) !important;
+        background-color: #F8FAFC !important;
+        border-color: rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    button[data-testid="stBaseButton-secondary"]:active {
+        transform: translateY(0px) !important;
+    }
+    
+    /* Style the tabs widget for premium Segmented Controls look */
+    div[data-baseweb="tab-list"] {
+        gap: 0.5rem !important;
+        background-color: rgba(241, 245, 249, 0.8) !important;
+        padding: 6px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    button[data-baseweb="tab"] {
+        background-color: transparent !important;
+        color: #64748B !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 10px 24px !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        transition: all 0.2s ease !important;
+        height: auto !important;
+    }
+    
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background-color: rgba(99, 102, 241, 0.1) !important;
+        color: #4F46E5 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+        border-bottom: none !important;
+    }
+    
+    button[data-baseweb="tab"]:hover {
+        color: #334155 !important;
+        background-color: rgba(0, 0, 0, 0.02) !important;
+    }
+    
+    /* Input adjustments for Streamlit components */
+    div[data-baseweb="input"], div[data-baseweb="textarea"], div[data-baseweb="select"] {
+        background-color: #FFFFFF !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-radius: 12px !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    div[data-baseweb="input"]:focus-within, div[data-baseweb="textarea"]:focus-within, div[data-baseweb="select"]:focus-within {
+        border-color: #6366F1 !important;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1) !important;
+    }
+    
+    div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {
+        color: #0F172A !important;
+    }
+    
+    /* File Uploader Box customization */
+    div[data-testid="stFileUploader"] section {
+        background-color: rgba(241, 245, 249, 0.5) !important;
+        border: 2px dashed rgba(99, 102, 241, 0.2) !important;
+        border-radius: 16px !important;
+        padding: 2rem !important;
+        transition: all 0.2s ease !important;
+        color: #64748B !important;
+    }
+    
+    div[data-testid="stFileUploader"] section:hover {
+        border-color: #6366F1 !important;
+        background-color: rgba(99, 102, 241, 0.02) !important;
+    }
+    
+    /* Sidebar adjustments */
+    section[data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid rgba(0, 0, 0, 0.06) !important;
+    }
+    
+    section[data-testid="stSidebar"] div[class*="stVerticalBlock"] {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    /* Sleek Custom Alert styling */
+    div[data-testid="stAlert"] {
+        background-color: rgba(255, 255, 255, 0.6) !important;
+        backdrop-filter: blur(8px) !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        padding: 1rem 1.5rem !important;
+        color: #334155 !important;
+    }
+    
+    div[data-testid="stAlert"] div[role="alert"] {
+        color: #334155 !important;
+    }
+    
+    /* Transition animation on theme toggle */
+    html, body, [class*="css"], .stMarkdown, .stApp, .login-container, .dash-header, .glass-card, 
+    .radial-score, .radial-score::before, .radial-score-value, button, div[data-baseweb="tab-list"], 
+    button[data-baseweb="tab"], div[data-baseweb="input"], div[data-baseweb="textarea"], 
+    div[data-baseweb="select"], div[data-testid="stFileUploader"] section, section[data-testid="stSidebar"],
+    div[data-testid="stAlert"] {
+        transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    background-image 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    color 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+else:
+    st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     
@@ -500,6 +819,19 @@ st.markdown("""
     div[data-testid="stAlert"] div[role="alert"] {
         color: #E2E8F0 !important;
     }
+    
+    /* Transition animation on theme toggle */
+    html, body, [class*="css"], .stMarkdown, .stApp, .login-container, .dash-header, .glass-card, 
+    .radial-score, .radial-score::before, .radial-score-value, button, div[data-baseweb="tab-list"], 
+    button[data-baseweb="tab"], div[data-baseweb="input"], div[data-baseweb="textarea"], 
+    div[data-baseweb="select"], div[data-testid="stFileUploader"] section, section[data-testid="stSidebar"],
+    div[data-testid="stAlert"] {
+        transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    background-image 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    color 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                    box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -577,6 +909,8 @@ if not st.session_state.authenticated:
                         else:
                             st.error("Failed to create account. Please contact your system administrator.")
                             
+        st.write("")
+        render_theme_toggle("login_")
         st.markdown("""
         <div style="text-align: center; color: #64748B; font-size: 0.8rem; margin-top: 2rem;">
             Authorized users only. Powered by Gemini 1.5 Flash.
@@ -626,6 +960,8 @@ with col_head2:
 # --- SIDEBAR: Configuration & Uploads (Isolated & Persisted) ---
 with st.sidebar:
     st.markdown(f"### User Session: {st.session_state.current_user.capitalize()}")
+    render_theme_toggle("sidebar_")
+    st.markdown("---")
     st.markdown("Enter your personal API keys below. They are isolated from other users.")
     
     # Session-bound credential inputs
