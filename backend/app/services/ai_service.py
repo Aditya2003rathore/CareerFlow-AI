@@ -1,3 +1,4 @@
+import os
 import json
 import litellm
 from backend.app.database.models import SessionLocal, MatchScore, Resume
