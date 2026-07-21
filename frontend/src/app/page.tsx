@@ -382,14 +382,14 @@ export default function CareerFlowCopilot() {
       });
       const data = await res.json();
       if (res.ok) {
-        setAutomationLogs(prev => ({ ...prev, [jobId]: "✅ Playwright pre-filled application!" }));
+        setAutomationLogs(prev => ({ ...prev, [jobId]: "Playwright pre-filled application!" }));
         setSuccessMsg("Pre-fill complete.");
         loadApplications(token);
       } else {
-        setAutomationLogs(prev => ({ ...prev, [jobId]: `❌ Failed: ${data.detail}` }));
+        setAutomationLogs(prev => ({ ...prev, [jobId]: `Failed: ${data.detail}` }));
       }
     } catch (e) {
-      setAutomationLogs(prev => ({ ...prev, [jobId]: "❌ Automation execution error." }));
+      setAutomationLogs(prev => ({ ...prev, [jobId]: "Automation execution error." }));
     }
   };
 
@@ -647,7 +647,7 @@ export default function CareerFlowCopilot() {
             disabled={loading}
             className="w-full bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.1)] text-[#EDEFEA] font-semibold py-3 rounded-xl transition text-xs flex justify-center items-center gap-2 cursor-pointer"
           >
-            ⚡ 1-Click Demo Login (Instant Access)
+            1-Click Demo Login (Instant Access)
           </button>
         </div>
       </div>
@@ -769,7 +769,7 @@ export default function CareerFlowCopilot() {
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div className="font-mono text-[10px] uppercase tracking-widest text-[#F0B057] flex items-center gap-2 bg-[rgba(240,176,87,0.1)] px-3 py-1.5 rounded-full border border-[rgba(240,176,87,0.2)]">
                   <span className="w-2 h-2 bg-[#F0B057] rounded-full animate-ping" />
-                  ⚡ AI Engine Active • Zero-Config Default Groq Key Built-In
+                  AI Engine Active • Zero-Config Default Groq Key Built-In
                 </div>
 
                 <div className="text-[10px] font-mono text-[#9BA8A1] bg-[rgba(255,255,255,0.04)] px-3 py-1.5 rounded-full border border-[rgba(255,255,255,0.08)]">
@@ -1073,12 +1073,12 @@ export default function CareerFlowCopilot() {
                             className="bg-[#F0B057] hover:bg-[#e09e47] text-[#241705] font-semibold px-3 py-2 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer shadow"
                           >
                             <Zap className="w-3.5 h-3.5" />
-                            🤖 AI Auto-Fill (Playwright)
+                            AI Auto-Fill (Playwright)
                           </button>
 
                           <a href={job.url} target="_blank" rel="noopener noreferrer">
                             <button className="bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.08)] text-[#EDEFEA] px-3 py-2 rounded-lg text-xs transition flex items-center gap-1 cursor-pointer">
-                              Apply Manually 🔗
+                              Apply Manually
                             </button>
                           </a>
 
@@ -1382,7 +1382,7 @@ export default function CareerFlowCopilot() {
                           <div className="flex gap-2 shrink-0">
                             <a href={lead.linkedin_url} target="_blank" rel="noopener noreferrer">
                               <button className="bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.06)] text-[#EDEFEA] px-3 py-1.5 rounded-lg transition font-medium">
-                                Profile 🔗
+                                Profile
                               </button>
                             </a>
                             <button

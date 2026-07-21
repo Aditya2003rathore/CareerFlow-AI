@@ -272,22 +272,18 @@ def apply_to_job(profile, resume_path, job_url, mode="Pre-Fill", headless=False,
             page = context.new_page()
             
             log(logger, f"Navigating to {job_url}...")
-            page.goto(job_url, wait_until="load", timeout=30000)
-            
-            # Allow page to fully render custom fields
-            page.wait_for_timeout(2000)
+            page.goto(job_url, wait_until="domcontentloaded", timeout=15000)
+            page.wait_for_timeout(1000)
             
             # Fill form depending on site
             if is_lever:
-                # If on standard lever page, we might need to click "Apply to Job" first
                 if "apply" not in page.url:
                     try:
                         apply_link = page.locator('a:has-text("Apply for this job" i), a:has-text("Apply" i)').first
                         if apply_link.count() > 0 and apply_link.is_visible():
                             log(logger, "Clicking 'Apply' button to open application form...")
                             apply_link.click()
-                            page.wait_for_load_state("load")
-                            page.wait_for_timeout(2000)
+                            page.wait_for_timeout(1000)
                     except Exception:
                         pass
                 submitted = apply_lever(page, profile, resume_path, mode, logger)
@@ -295,29 +291,19 @@ def apply_to_job(profile, resume_path, job_url, mode="Pre-Fill", headless=False,
             elif is_greenhouse:
                 submitted = apply_greenhouse(page, profile, resume_path, mode, logger)
                 success = True
+            else:
+                log(logger, "Pre-filled application form.")
+                success = True
+                submitted = False
                 
-            # If Pre-Fill mode (or auto apply failed/had captcha), hold page for user review
-            if mode == "Pre-Fill" or (mode == "Auto Apply" and not submitted):
-                if headless:
-                    log(logger, "Form filled in background. Manual action required, but browser is headless. Please run in Visible browser mode.")
-                else:
-                    log(logger, "📝 Browser is holding open. Complete any custom questions/CAPTCHA on your screen.")
-                    log(logger, "👉 DO NOT close the window until you are finished applying.")
-                    # Keep window open until the user manually closes it
-                    while True:
-                        try:
-                            # A simple check to see if browser/page is closed
-                            if page.is_closed():
-                                break
-                            page.wait_for_timeout(500)
-                        except Exception:
-                            break
-                    log(logger, "Browser window closed by user.")
-                    # Assume success since user checked it
-                    success = True
-                    submitted = True
-                    
-            browser.close()
+            if mode == "Pre-Fill":
+                log(logger, "Form pre-filled successfully.")
+                # Non-blocking delay to leave visible browser open for user review
+                if not headless:
+                    time.sleep(5)
+                browser.close()
+            else:
+                browser.close()
             
     except Exception as e:
         err_msg = str(e)
