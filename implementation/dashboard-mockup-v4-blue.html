@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Dark Mockup v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0F0D;
+    --glass:rgba(255,255,255,0.045);
+    --glass-strong:rgba(255,255,255,0.07);
+    --glass-border:rgba(255,255,255,0.09);
+    --glass-border-hover:rgba(255,255,255,0.16);
+
+    --text:#EDEFEA;
+    --text-soft:#9BA8A1;
+    --text-faint:#5C6A63;
+
+    --blue:#4C8FF0;
+    --blue-glow:rgba(76,143,240,0.30);
+    --amber:#F0B057;
+    --amber-glow:rgba(240,176,87,0.32);
+    --ember:#EC7A5E;
+    --ember-glow:rgba(236,122,94,0.28);
+    --violet:#9B8AFB;
+
+    --stage-discovered:#5C6A63;
+    --stage-saved:#4C8FF0;
+    --stage-applied:#F0B057;
+    --stage-interview:#E8935B;
+    --stage-offer:#9B8AFB;
+
+    --font-display:'Space Grotesk', -apple-system, sans-serif;
+    --font-body:'Inter', -apple-system, sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+
+    --r-lg:16px; --r-md:11px; --r-sm:7px;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--font-body); -webkit-font-smoothing:antialiased;
+    font-size:14px; line-height:1.5;
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:var(--font-body); cursor:pointer;}
+
+  /* ===== ambient background glow orbs ===== */
+  .glow-orb{position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0;}
+  .glow-1{width:520px; height:520px; background:var(--blue-glow); top:-180px; left:-140px; opacity:0.55;}
+  .glow-2{width:460px; height:460px; background:var(--amber-glow); bottom:-160px; right:-100px; opacity:0.4;}
+
+  .app{position:relative; z-index:1; display:grid; grid-template-columns:224px 1fr; min-height:100vh;}
+
+  /* ===== Sidebar ===== */
+  .sidebar{
+    padding:20px 14px; display:flex; flex-direction:column;
+    position:sticky; top:0; height:100vh;
+    border-right:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.015);
+  }
+  .brand{
+    font-family:var(--font-display); font-weight:600; font-size:15px;
+    letter-spacing:-0.01em; margin-bottom:26px; display:flex; align-items:center; gap:7px; padding:0 6px;
+  }
+  .brand-dot{width:6px; height:6px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px var(--amber-glow); display:inline-block;}
+
+  .navlist{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1px;}
+  .navlist a{
+    display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px;
+    font-size:13px; color:var(--text-soft); transition:background 120ms, color 120ms;
+  }
+  .navlist a svg{width:15px; height:15px; opacity:0.8; flex-shrink:0;}
+  .navlist a:hover{background:var(--glass); color:var(--text);}
+  .navlist a.active{background:var(--glass-strong); color:var(--text); box-shadow:inset 0 0 0 1px var(--glass-border);}
+  .navlist a.active svg{color:var(--amber); opacity:1;}
+  .nav-count{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint);}
+
+  .sidebar-sync{margin-top:26px; padding:12px; border-radius:var(--r-md); background:var(--glass); border:1px solid var(--glass-border);}
+  .sidebar-sync .label{font-family:var(--font-mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-faint); margin-bottom:9px; display:flex; align-items:center; gap:6px;}
+  .pulse{width:5px; height:5px; border-radius:50%; background:var(--blue); box-shadow:0 0 6px var(--blue); animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.35;}}
+  @media (prefers-reduced-motion: reduce){.pulse{animation:none;}}
+  .source-row{display:flex; align-items:center; gap:7px; padding:3.5px 0; font-size:11.5px;}
+  .source-dot{width:5px; height:5px; border-radius:50%; background:var(--amber); flex-shrink:0;}
+  .source-dot.pending{background:var(--text-faint);}
+  .source-name{flex:1; color:var(--text-soft);}
+  .source-time{font-family:var(--font-mono); font-size:10px; color:var(--text-faint);}
+
+  .sidebar-profile{margin-top:auto; padding-top:14px; border-top:1px solid var(--glass-border); display:flex; align-items:center; gap:9px; padding-left:2px;}
+  .avatar-sm{
+    width:28px; height:28px; border-radius:50%; background:rgba(240,176,87,0.14); border:1px solid rgba(240,176,87,0.4);
+    display:flex; align-items:center; justify-content:center; color:var(--amber); font-weight:600; font-size:11.5px; flex-shrink:0;
+  }
+  .profile-name{font-size:12.5px; color:var(--text); font-weight:500;}
+  .profile-sub{font-size:10.5px; color:var(--text-faint);}
+
+  /* ===== Main ===== */
+  .main{padding:26px 36px 70px; max-width:960px;}
+
+  .topbar{display:flex; align-items:center; gap:10px; margin-bottom:26px;}
+  .search{
+    flex:1; display:flex; align-items:center; gap:9px;
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--r-md);
+    padding:9px 12px; font-size:12.5px; color:var(--text-faint);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  }
+  .search svg{width:14px; height:14px; opacity:0.6; flex-shrink:0;}
+  .kbd{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); border:1px solid var(--glass-border); border-radius:5px; padding:1.5px 6px; background:rgba(0,0,0,0.2);}
+  .icon-btn{
+    width:34px; height:34px; border-radius:var(--r-md); border:1px solid var(--glass-border);
+    background:var(--glass); display:flex; align-items:center; justify-content:center;
+    backdrop-filter:blur(16px);
+  }
+  .icon-btn svg{width:15px; height:15px; color:var(--text-soft);}
+  .btn-primary{
+    background:var(--amber); color:#241705; border:none; border-radius:var(--r-md);
+    padding:8.5px 14px; font-size:12.5px; font-weight:600; display:flex; align-items:center; gap:6px;
+    box-shadow:0 0 0 1px rgba(240,176,87,0.4), 0 4px 16px var(--amber-glow);
+  }
+  .btn-primary svg{width:13px; height:13px;}
+
+  /* ===== Hero ===== */
+  .hero{
+    position:relative; overflow:hidden;
+    background:linear-gradient(160deg, rgba(76,143,240,0.10) 0%, rgba(255,255,255,0.03) 55%);
+    border:1px solid var(--glass-border); border-radius:var(--r-lg);
+    padding:26px 28px; margin-bottom:28px;
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  }
+  .hero-path{position:absolute; right:20px; top:16px; opacity:0.7;}
+  .eyebrow{font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:10px; display:flex; align-items:center; gap:7px;}
+  .headline{
+    font-family:var(--font-display); font-weight:600; font-size:26px;
+    line-height:1.2; letter-spacing:-0.02em; margin:0 0 9px; max-width:18ch;
+  }
+  .subhead{font-size:13px; color:var(--text-soft); max-width:50ch; line-height:1.6; margin-bottom:20px;}
+  .stat-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .stat-chip{
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    border-radius:var(--r-sm); padding:9px 14px; min-width:98px;
+  }
+  .stat-chip .n{font-family:var(--font-mono); font-size:18px; font-weight:600; color:var(--text);}
+  .stat-chip .l{font-size:10.5px; color:var(--text-faint); margin-top:2px;}
+
+  /* ===== Filters ===== */
+  .filters{display:flex; align-items:center; gap:7px; margin-bottom:18px; flex-wrap:wrap;}
+  .chip{
+    font-size:11.5px; padding:6px 12px; border-radius:20px; border:1px solid var(--glass-border);
+    background:var(--glass); color:var(--text-soft); font-weight:500;
+  }
+  .chip.on{background:rgba(255,255,255,0.09); color:var(--text); border-color:var(--glass-border-hover);}
+  .filters .sort{margin-left:auto; font-size:11.5px; color:var(--text-faint); display:flex; align-items:center; gap:6px; font-family:var(--font-mono);}
+
+  .section-label{display:flex; align-items:baseline; justify-content:space-between; margin:34px 0 12px;}
+  .section-label h2{font-size:11.5px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-soft); margin:0;}
+  .section-label span{font-family:var(--font-mono); font-size:11px; color:var(--text-faint);}
+
+  /* ===== Job cards ===== */
+  .job-list{display:flex; flex-direction:column; gap:10px;}
+  .card{
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--r-md);
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    display:flex; overflow:hidden; transition:border-color 150ms, background 150ms;
+  }
+  .card:hover{background:var(--glass-strong); border-color:var(--glass-border-hover);}
+  .rail{width:3px; flex-shrink:0;}
+  .card-body{flex:1; padding:15px 17px;}
+  .card-top{display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:flex-start;}
+
+  .company-avatar{
+    width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-weight:600; font-size:12.5px; flex-shrink:0; background:rgba(255,255,255,0.04);
+    border:1px solid var(--glass-border);
+  }
+
+  .job-title-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:2px;}
+  .job-title{font-size:13.5px; font-weight:600; margin:0; color:var(--text);}
+  .tag{font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.03em; padding:2px 7px; border-radius:20px; text-transform:uppercase; background:rgba(76,143,240,0.12); color:var(--blue); border:1px solid rgba(76,143,240,0.25); font-weight:500;}
+  .tag.fresher{background:rgba(240,176,87,0.12); color:var(--amber); border-color:rgba(240,176,87,0.25);}
+  .tag.interview{background:rgba(232,147,91,0.12); color:var(--stage-interview); border-color:rgba(232,147,91,0.3);}
+  .job-meta{font-size:12px; color:var(--text-soft); display:flex; gap:10px; flex-wrap:wrap; margin-bottom:1px;}
+  .job-meta .sep{color:var(--text-faint);}
+  .job-salary{font-family:var(--font-mono); font-size:11.5px; color:var(--text);}
+  .job-source{font-family:var(--font-mono); font-size:10px; color:var(--text-faint); margin-top:3px;}
+
+  .match{display:flex; flex-direction:column; align-items:center; gap:2px;}
+  .ring-wrap{position:relative; width:44px; height:44px;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-track{fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3.5;}
+  .ring-fill{fill:none; stroke:var(--amber); stroke-width:3.5; stroke-linecap:round; stroke-dasharray:116; animation:fillring 900ms cubic-bezier(.4,0,.2,1) forwards; filter:drop-shadow(0 0 4px var(--amber-glow));}
+  .ring-num{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--text);}
+  .match-label{font-size:9px; color:var(--text-faint); font-family:var(--font-mono);}
+  @keyframes fillring{from{stroke-dashoffset:116;} to{stroke-dashoffset:var(--offset);}}
+  @media (prefers-reduced-motion: reduce){.ring-fill{animation:none; stroke-dashoffset:var(--offset);}}
+
+  .skill-chips{display:flex; gap:5px; flex-wrap:wrap; margin:11px 0 3px;}
+  .skill{font-size:10.5px; padding:3px 8px; border-radius:5px; font-family:var(--font-mono);}
+  .skill.match{background:rgba(76,143,240,0.10); color:var(--blue); border:1px solid rgba(76,143,240,0.2);}
+  .skill.gap{border:1px dashed rgba(236,122,94,0.4); color:var(--ember); background:transparent;}
+
+  .why{
+    font-size:11.5px; color:var(--text-soft); background:rgba(0,0,0,0.18); border-radius:8px;
+    padding:9px 11px; margin-top:9px; line-height:1.55; border-left:2px solid var(--amber);
+  }
+  .why b{color:var(--text); font-weight:600;}
+
+  .card-actions{display:flex; gap:7px; margin-top:12px;}
+  .card-actions .btn-primary{padding:6.5px 12px; font-size:11.5px;}
+  .btn-ghost{background:transparent; border:1px solid var(--glass-border); border-radius:var(--r-sm); padding:6.5px 11px; font-size:11.5px; color:var(--text-soft); font-weight:500;}
+  .btn-ghost:hover{border-color:var(--glass-border-hover); color:var(--text);}
+
+  /* ===== Kanban ===== */
+  .tracker{margin-top:38px;}
+  .kanban{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; overflow-x:auto; padding-bottom:4px;}
+  .column{background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:var(--r-md); padding:10px;}
+  .column-head{display:flex; align-items:center; gap:6px; margin-bottom:9px; padding:0 2px;}
+  .column-dot{width:6px; height:6px; border-radius:50%; background:var(--stage-color); box-shadow:0 0 5px var(--stage-color);}
+  .column-head .name{font-size:11px; font-weight:600; color:var(--text-soft);}
+  .column-head .count{margin-left:auto; font-family:var(--font-mono); font-size:10px; color:var(--text-faint);}
+  .mini-card{background:var(--glass); border:1px solid var(--glass-border); border-radius:8px; padding:9px 10px; margin-bottom:7px;}
+  .mini-card .t{font-size:11.5px; font-weight:600; color:var(--text); margin-bottom:1px;}
+  .mini-card .c{font-size:10.5px; color:var(--text-soft);}
+  .mini-card .s{font-family:var(--font-mono); font-size:9.5px; color:var(--text-faint); margin-top:4px;}
+  .column-empty{font-size:10.5px; color:var(--text-faint); text-align:center; padding:12px 6px; border:1px dashed var(--glass-border); border-radius:8px;}
+
+  :focus-visible{outline:2px solid var(--blue); outline-offset:2px; border-radius:4px;}
+
+  @media (max-width:920px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:relative; height:auto; flex-direction:row; align-items:center; padding:12px 16px; overflow-x:auto;}
+    .brand{margin-bottom:0; margin-right:18px;}
+    .navlist{flex-direction:row;}
+    .sidebar-sync, .sidebar-profile{display:none;}
+    .main{padding:20px 16px 56px;}
+    .kanban{grid-template-columns:repeat(5,200px);}
+  }
+  @media (max-width:600px){
+    .card-top{grid-template-columns:auto 1fr;}
+    .match{grid-column:1/-1; flex-direction:row; justify-content:flex-start; margin-top:9px;}
+  }
+</style>
+</head>
+<body>
+<div class="glow-orb glow-1"></div>
+<div class="glow-orb glow-2"></div>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-dot"></span>yourname.ai</div>
+    <ul class="navlist">
+      <li><a href="#" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard <span class="nav-count">6</span>
+      </a></li>
+      <li><a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+        Saved <span class="nav-count">4</span>
+      </a></li>
+      <li><a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+        Tracker
+      </a></li>
+      <li><a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/><path d="M9 13h6M9 17h6"/></svg>
+        Resume
+      </a></li>
+      <li><a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.9 2.9l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.6V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.9-2.9l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.6-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.9-2.9l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.6V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.9 2.9l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.6 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.6 1z"/></svg>
+        Settings
+      </a></li>
+    </ul>
+
+    <div class="sidebar-sync">
+      <div class="label"><span class="pulse"></span>Sources · synced 6:02 AM</div>
+      <div class="source-row"><span class="source-dot"></span><span class="source-name">Greenhouse</span><span class="source-time">142</span></div>
+      <div class="source-row"><span class="source-dot"></span><span class="source-name">Lever</span><span class="source-time">89</span></div>
+      <div class="source-row"><span class="source-dot"></span><span class="source-name">Ashby</span><span class="source-time">54</span></div>
+      <div class="source-row"><span class="source-dot"></span><span class="source-name">RemoteOK</span><span class="source-time">61</span></div>
+      <div class="source-row"><span class="source-dot pending"></span><span class="source-name">Adzuna</span><span class="source-time">queued</span></div>
+    </div>
+
+    <div class="sidebar-profile">
+      <div class="avatar-sm">A</div>
+      <div><div class="profile-name">Aditya</div><div class="profile-sub">Backend · Bangalore</div></div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Search jobs, companies, skills…
+        <span class="kbd">⌘K</span>
+      </div>
+      <button class="icon-btn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+      </button>
+      <button class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+        Sync now
+      </button>
+    </div>
+
+    <!-- Hero digest -->
+    <div class="hero">
+      <svg class="hero-path" width="170" height="60" viewBox="0 0 170 60" fill="none">
+        <path d="M2 50 C36 50, 36 12, 72 16 S 108 46, 150 12" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" stroke-dasharray="1 6" stroke-linecap="round"/>
+        <circle cx="2" cy="50" r="3" fill="var(--blue)"/>
+        <circle cx="72" cy="16" r="3" fill="var(--amber)"/>
+        <circle cx="150" cy="12" r="4" fill="var(--amber)" filter="drop-shadow(0 0 4px var(--amber-glow))"/>
+      </svg>
+      <div class="eyebrow"><span class="pulse"></span>Tuesday · Morning digest</div>
+      <h1 class="headline">6 strong matches this morning</h1>
+      <p class="subhead">Checked 5 sources overnight and compared them against your resume. 2 postings are worth a decision before they go stale.</p>
+      <div class="stat-row">
+        <div class="stat-chip"><div class="n">6</div><div class="l">New matches</div></div>
+        <div class="stat-chip"><div class="n">2</div><div class="l">Need action</div></div>
+        <div class="stat-chip"><div class="n">346</div><div class="l">Jobs scanned</div></div>
+        <div class="stat-chip"><div class="n">1</div><div class="l">Interview this wk</div></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <span class="chip on">All</span>
+      <span class="chip">Remote</span>
+      <span class="chip">Fresher</span>
+      <span class="chip">Bangalore</span>
+      <span class="chip">₹15+ LPA</span>
+      <div class="sort">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+        sorted · match
+      </div>
+    </div>
+
+    <div class="section-label"><h2>Today's matches</h2><span>5 of 6 shown</span></div>
+
+    <div class="job-list">
+
+      <!-- Card 1 -->
+      <div class="card">
+        <div class="rail" style="background:var(--stage-saved)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="company-avatar" style="color:var(--blue)">R</div>
+            <div class="job-main">
+              <div class="job-title-row"><p class="job-title">Backend Engineer</p><span class="tag">Saved</span></div>
+              <div class="job-meta"><span>Razorpay</span><span class="sep">·</span><span>Bangalore · Remote OK</span><span class="sep">·</span><span class="job-salary">₹18–24 LPA</span></div>
+              <div class="job-source">via greenhouse · posted 2d ago</div>
+            </div>
+            <div class="match">
+              <div class="ring-wrap"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="ring-track" cx="22" cy="22" r="18.5"/><circle class="ring-fill" cx="22" cy="22" r="18.5" style="--offset:9"/></svg><div class="ring-num">92</div></div>
+              <span class="match-label">match</span>
+            </div>
+          </div>
+          <div class="skill-chips">
+            <span class="skill match">Python</span><span class="skill match">FastAPI</span><span class="skill match">PostgreSQL</span><span class="skill match">AWS</span>
+          </div>
+          <div class="why"><b>Why this match:</b> your Postman internship + 2 production FastAPI services line up almost exactly with what this posting asks for.</div>
+          <div class="card-actions">
+            <button class="btn-primary">Prepare Application</button>
+            <button class="btn-ghost">View posting</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card">
+        <div class="rail" style="background:var(--stage-applied)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="company-avatar" style="color:var(--amber)">P</div>
+            <div class="job-main">
+              <div class="job-title-row"><p class="job-title">Python Developer</p><span class="tag">Applied</span></div>
+              <div class="job-meta"><span>Postman</span><span class="sep">·</span><span>Bangalore · Remote</span><span class="sep">·</span><span class="job-salary">₹20–28 LPA</span></div>
+              <div class="job-source">via lever · posted 4d ago</div>
+            </div>
+            <div class="match">
+              <div class="ring-wrap"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="ring-track" cx="22" cy="22" r="18.5"/><circle class="ring-fill" cx="22" cy="22" r="18.5" style="--offset:17"/></svg><div class="ring-num">85</div></div>
+              <span class="match-label">match</span>
+            </div>
+          </div>
+          <div class="skill-chips">
+            <span class="skill match">Python</span><span class="skill match">Docker</span><span class="skill gap">gRPC</span>
+          </div>
+          <div class="card-actions"><button class="btn-ghost">Applied Mar 14 · view status</button></div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card">
+        <div class="rail" style="background:var(--stage-discovered)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="company-avatar" style="color:var(--text-soft)">F</div>
+            <div class="job-main">
+              <div class="job-title-row"><p class="job-title">SDE-1, Backend</p><span class="tag">Discovered</span></div>
+              <div class="job-meta"><span>Freshworks</span><span class="sep">·</span><span>Chennai</span><span class="sep">·</span><span class="job-salary">₹12–16 LPA</span></div>
+              <div class="job-source">via ashby · posted 1d ago</div>
+            </div>
+            <div class="match">
+              <div class="ring-wrap"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="ring-track" cx="22" cy="22" r="18.5"/><circle class="ring-fill" cx="22" cy="22" r="18.5" style="--offset:30"/></svg><div class="ring-num">74</div></div>
+              <span class="match-label">match</span>
+            </div>
+          </div>
+          <div class="skill-chips">
+            <span class="skill match">Java</span><span class="skill match">Spring</span><span class="skill gap">Kubernetes</span><span class="skill gap">gRPC</span>
+          </div>
+          <div class="card-actions"><button class="btn-primary">Prepare Application</button><button class="btn-ghost">Save for later</button></div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="card">
+        <div class="rail" style="background:var(--stage-interview)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="company-avatar" style="color:var(--stage-interview)">B</div>
+            <div class="job-main">
+              <div class="job-title-row"><p class="job-title">Senior Backend Engineer</p><span class="tag interview">Interview</span></div>
+              <div class="job-meta"><span>BrowserStack</span><span class="sep">·</span><span>Mumbai</span><span class="sep">·</span><span class="job-salary">₹30–40 LPA</span></div>
+              <div class="job-source">via company site · posted 9d ago</div>
+            </div>
+            <div class="match">
+              <div class="ring-wrap"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="ring-track" cx="22" cy="22" r="18.5"/><circle class="ring-fill" cx="22" cy="22" r="18.5" style="--offset:41"/></svg><div class="ring-num">65</div></div>
+              <span class="match-label">match</span>
+            </div>
+          </div>
+          <div class="skill-chips"><span class="skill gap">System design at scale</span></div>
+          <div class="card-actions"><button class="btn-ghost">Interview Thu 3:00 PM · prep questions →</button></div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="card">
+        <div class="rail" style="background:var(--stage-discovered)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="company-avatar" style="color:var(--violet)">Z</div>
+            <div class="job-main">
+              <div class="job-title-row"><p class="job-title">Backend Intern</p><span class="tag fresher">Fresher</span></div>
+              <div class="job-meta"><span>Zoho</span><span class="sep">·</span><span>Chennai</span><span class="sep">·</span><span class="job-salary">₹6 LPA stipend</span></div>
+              <div class="job-source">via company site · posted 6h ago</div>
+            </div>
+            <div class="match">
+              <div class="ring-wrap"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="ring-track" cx="22" cy="22" r="18.5"/><circle class="ring-fill" cx="22" cy="22" r="18.5" style="--offset:35"/></svg><div class="ring-num">70</div></div>
+              <span class="match-label">match</span>
+            </div>
+          </div>
+          <div class="card-actions"><button class="btn-primary">Prepare Application</button><button class="btn-ghost">Save for later</button></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Kanban tracker -->
+    <div class="tracker">
+      <div class="section-label"><h2>Your pipeline</h2><span>6 active</span></div>
+      <div class="kanban">
+        <div class="column">
+          <div class="column-head" style="--stage-color:var(--stage-discovered)"><span class="column-dot"></span><span class="name">Discovered</span><span class="count">3</span></div>
+          <div class="mini-card"><div class="t">SDE-1, Backend</div><div class="c">Freshworks</div><div class="s">₹12–16 LPA</div></div>
+          <div class="mini-card"><div class="t">Backend Intern</div><div class="c">Zoho</div><div class="s">₹6 LPA</div></div>
+          <div class="mini-card"><div class="t">Platform Engineer</div><div class="c">Groww</div><div class="s">₹22–30 LPA</div></div>
+        </div>
+        <div class="column">
+          <div class="column-head" style="--stage-color:var(--stage-saved)"><span class="column-dot"></span><span class="name">Saved</span><span class="count">1</span></div>
+          <div class="mini-card"><div class="t">Backend Engineer</div><div class="c">Razorpay</div><div class="s">₹18–24 LPA</div></div>
+        </div>
+        <div class="column">
+          <div class="column-head" style="--stage-color:var(--stage-applied)"><span class="column-dot"></span><span class="name">Applied</span><span class="count">1</span></div>
+          <div class="mini-card"><div class="t">Python Developer</div><div class="c">Postman</div><div class="s">Mar 14</div></div>
+        </div>
+        <div class="column">
+          <div class="column-head" style="--stage-color:var(--stage-interview)"><span class="column-dot"></span><span class="name">Interview</span><span class="count">1</span></div>
+          <div class="mini-card"><div class="t">Sr Backend Engineer</div><div class="c">BrowserStack</div><div class="s">Thu 3 PM</div></div>
+        </div>
+        <div class="column">
+          <div class="column-head" style="--stage-color:var(--stage-offer)"><span class="column-dot"></span><span class="name">Offer</span><span class="count">0</span></div>
+          <div class="column-empty">Nothing here yet</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

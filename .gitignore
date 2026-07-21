@@ -16,3 +16,12 @@ __pycache__/
 # Temp / Scratch files
 .tempmediaStorage/
 scratch/
+
+# Database and build artifacts
+*.db
+*.db-shm
+*.db-wal
+.encryption_key.txt
+node_modules/
+.next/
+careerapp/

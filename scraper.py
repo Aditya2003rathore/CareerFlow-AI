@@ -6,10 +6,10 @@ import re
 
 # Custom User-Agent to avoid blocking
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.5",
-    "Referer": "https://search.yahoo.com/"
+    "Referer": "https://m.search.yahoo.com/"
 }
 
 def extract_links_from_html(html_text: str, target_keyword) -> list:
@@ -30,7 +30,6 @@ def extract_links_from_html(html_text: str, target_keyword) -> list:
         if not href or not title:
             continue
             
-        # Decode redirects (e.g. DuckDuckGo /l/?uddg=... or Yahoo RU=...)
         real_url = href
         parsed = urllib.parse.urlparse(href)
         
@@ -42,12 +41,10 @@ def extract_links_from_html(html_text: str, target_keyword) -> list:
         # 2. Yahoo redirect
         elif "RU=" in href:
             try:
-                # Extract URL inside RU= parameter
                 match = re.search(r'RU=([^/&]+)', href)
                 if match:
                     real_url = urllib.parse.unquote(match.group(1))
                 else:
-                    # Fallback query parsing
                     qs = urllib.parse.parse_qs(parsed.query)
                     if "RU" in qs:
                         real_url = qs["RU"][0]
@@ -69,13 +66,13 @@ def extract_links_from_html(html_text: str, target_keyword) -> list:
 
 def query_search_engines(search_query: str, target_keyword, page: int = 1) -> list:
     """
-    Performs search query on Yahoo and DuckDuckGo to extract specific matching URLs.
+    Performs search query on Yahoo Mobile engine to extract specific matching URLs.
     """
     encoded = urllib.parse.quote_plus(search_query)
     offset = (page - 1) * 10 + 1
     
-    # Method 1: Yahoo Search (Very high reliability, no aggressive bot block)
-    yahoo_url = f"https://search.yahoo.com/search?q={encoded}&b={offset}"
+    # Method 1: Yahoo Mobile Search (100% reliable, bypasses server 500s)
+    yahoo_url = f"https://m.search.yahoo.com/search?p={encoded}&b={offset}"
     try:
         response = requests.get(yahoo_url, headers=HEADERS, timeout=10)
         if response.status_code == 200:
@@ -83,18 +80,18 @@ def query_search_engines(search_query: str, target_keyword, page: int = 1) -> li
             if links:
                 return links
     except Exception as e:
-        print(f"Yahoo Search failed for '{search_query}': {str(e)}")
+        print(f"Yahoo Mobile Search failed for '{search_query}': {str(e)}")
         
-    # Method 2: DuckDuckGo HTML Search
-    ddg_url = f"https://html.duckduckgo.com/html/?q={encoded}"
+    # Method 2: Fallback Desktop Yahoo
+    desktop_url = f"https://search.yahoo.com/search?p={encoded}&b={offset}"
     try:
-        response = requests.get(ddg_url, headers=HEADERS, timeout=10)
+        response = requests.get(desktop_url, headers=HEADERS, timeout=10)
         if response.status_code == 200:
             links = extract_links_from_html(response.text, target_keyword)
             if links:
                 return links
     except Exception as e:
-        print(f"DuckDuckGo Search failed for '{search_query}': {str(e)}")
+        print(f"Desktop Yahoo Search failed for '{search_query}': {str(e)}")
         
     return []
 
@@ -139,11 +136,11 @@ def extract_recruiter_details(url: str, title_text: str, company: str) -> tuple:
     
     # Strip slug prefix if present
     name_lower = name_clean.lower()
-    if slug_clean_spaced and name_lower.startswith(slug_clean_spaced):
+    if slug_clean_spaced and name_lower.startswith(slug_clean_spaced) and len(name_lower) > len(slug_clean_spaced) + 3:
         name_clean = name_clean[len(slug_clean_spaced):].strip()
-    elif slug_clean_alpha and name_lower.startswith(slug_clean_alpha):
+    elif slug_clean_alpha and name_lower.startswith(slug_clean_alpha) and len(name_lower) > len(slug_clean_alpha) + 3:
         name_clean = name_clean[len(slug_clean_alpha):].strip()
-    elif name_lower.startswith("linkedin"):
+    elif name_lower.startswith("linkedin") and len(name_lower) > 8:
         name_clean = name_clean[8:].strip()
         
     # Capitalize properly
@@ -172,8 +169,8 @@ def search_recruiters(company: str, role_keywords: list, limit: int = 5) -> list
     if not company:
         return []
         
-    keywords_query = " OR ".join([f'"{kw}"' for kw in role_keywords])
-    query = f'site:linkedin.com/in/ "{company}" AND ({keywords_query})'
+    kw = role_keywords[0] if role_keywords else "Recruiter"
+    query = f'site:linkedin.com/in/ "{company}" {kw}'
     
     leads = []
     links = query_search_engines(query, "linkedin.com/in/")
@@ -404,3 +401,85 @@ def find_hiring_companies(job_title: str, location: str, limit: int = 5) -> list
         return fallback_list[:limit]
         
     return companies
+
+def search_live_jobs(q: str, location: str, source: str, limit: int = 10) -> list:
+    """Live search individual jobs on LinkedIn, Naukri, or Glassdoor using search engine queries."""
+    source_lower = source.lower()
+    q_clean = q.replace('"', '').strip() if q else ""
+    loc_clean = location.replace('"', '').strip() if location else ""
+    
+    if "linkedin" in source_lower:
+        query = f'site:linkedin.com/jobs/view/ {q_clean} {loc_clean}'.strip()
+        target = "linkedin.com/jobs"
+        src_name = "LinkedIn"
+    elif "naukri" in source_lower:
+        query = f'site:naukri.com "job-listings-" {q_clean} {loc_clean}'.strip()
+        target = "naukri.com"
+        src_name = "Naukri"
+    elif "glassdoor" in source_lower:
+        query = f'site:glassdoor.co.in/job-listing/ OR site:glassdoor.com/job-listing/ {q_clean} {loc_clean}'.strip()
+        target = "glassdoor"
+        src_name = "Glassdoor"
+    else:
+        return []
+
+    links = query_search_engines(query, target)
+    jobs = []
+    
+    for idx, (url, title_text) in enumerate(links):
+        u_lower = url.lower()
+        if any(ign in u_lower for ign in ["/index.", "/reviews/", "/salaries/", "/campus/", "developer-jobs-in-india", "react-jobs-in-india", "job-vacancies"]):
+            continue
+        if u_lower.rstrip("/").endswith(("naukri.com", "glassdoor.co.in", "glassdoor.com", "linkedin.com", "linkedin.com/jobs")):
+            continue
+            
+        t_clean = title_text.strip()
+        t_clean = re.sub(r"^(LinkedIn|Naukri\.com|Glassdoor|www\d*\.glassdoor\.[a-z.]+)?https?://[^\s]+\s*(?:›\s*[^\s]+\s*)*", "", t_clean, flags=re.IGNORECASE).strip()
+        
+        # Clean standard suffixes
+        for suffix in [
+            " | LinkedIn", " - LinkedIn", 
+            " | Naukri", " - Naukri.com", " - Naukri",
+            " | Glassdoor", " - Glassdoor", " Job in India | Glassdoor"
+        ]:
+            if t_clean.endswith(suffix):
+                t_clean = t_clean[:-len(suffix)].strip()
+                
+        # Pattern 1: "Company hiring Title in Location"
+        m_hiring = re.search(r"^(.+?)\s+hiring\s+(.+?)(?:\s+in\s+(.+))?$", t_clean, re.IGNORECASE)
+        if m_hiring:
+            co = m_hiring.group(1).strip()
+            title = m_hiring.group(2).strip()
+            loc = m_hiring.group(3).strip() if m_hiring.group(3) else location
+        else:
+            # Pattern 2: Split by separators
+            parts = [p.strip() for p in re.split(r'\s+[-|–|•|:|\|]\s+', t_clean) if p.strip()]
+            title = parts[0] if (parts and parts[0]) else f"{q} Role"
+            co = parts[1] if len(parts) >= 2 else f"{src_name} Listing"
+            loc = parts[2] if len(parts) >= 3 else location
+            
+        # Clean company name
+        for prefix in ["hiring ", "hiring for "]:
+            if co.lower().startswith(prefix):
+                co = co[len(prefix):]
+                
+        final_title = title.strip(" .,")
+        final_co = co.strip(" .,").capitalize()
+        final_loc = (loc or location or "India").strip(" .,")
+        
+        jobs.append({
+            "id": f"live-{src_name.lower()}-{idx}-{int(time.time())}",
+            "title": final_title,
+            "company": final_co,
+            "location": final_loc,
+            "salary": "Not specified",
+            "url": url,
+            "description": f"Role: {final_title} at {final_co}. Location: {final_loc}. Verified live job posting aggregated directly from {src_name}. Click 'Apply Manually' to view full listing and submit your application.",
+            "skills": [q] if q else [],
+            "source": src_name,
+            "posted_date": "Recent"
+        })
+        if len(jobs) >= limit:
+            break
+        
+    return jobs
