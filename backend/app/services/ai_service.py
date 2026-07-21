@@ -78,15 +78,13 @@ def get_ai_completion(prompt: str, api_key: str = "", provider_model: str = "gem
             except Exception:
                 pass
                 
-        if is_quota or key_to_use == settings.DEFAULT_GROQ_API_KEY:
-            raise RuntimeError("API quota limit reached on default Groq key. Please navigate to Settings / Keys to add your custom Gemini or Groq API key to continue auto-scoring.")
+        if is_quota:
+            raise RuntimeError("API quota limit reached on your Groq AI key. Please navigate to Settings / Keys to add your custom Gemini or Groq API key.")
         raise primary_error
 
 def parse_resume_profile(resume_text: str, api_key: str = "", provider_model: str = "gemini/gemini-1.5-flash") -> dict:
     """Parses raw resume text into structured JSON profile."""
     effective_key = api_key.strip() if api_key and api_key.strip() else settings.DEFAULT_GROQ_API_KEY
-    if not resume_text.strip():
-        raise ValueError("Resume text is empty.")
     if not resume_text.strip():
         raise ValueError("Resume text is empty.")
         
@@ -114,7 +112,7 @@ def parse_resume_profile(resume_text: str, api_key: str = "", provider_model: st
     {resume_text}
     """
     
-    response_text = get_ai_completion(prompt, api_key, provider_model)
+    response_text = get_ai_completion(prompt, effective_key, provider_model)
     # Find JSON bounds in case markdown wrapper block exists
     try:
         start_idx = response_text.find("{")
