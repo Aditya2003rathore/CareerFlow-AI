@@ -16,3 +16,4 @@ python-multipart>=0.0.6
 litellm>=1.0.0
 slowapi>=0.1.5
 psycopg2-binary>=2.9.0
+gunicorn>=21.2.0
